@@ -1,0 +1,9 @@
+C:\Users\stefa\Documents\A A C_Compiler_CSharp_8\Calculator_CS_8\obj\Debug\Calculator_CS_8.csproj.AssemblyReference.cache
+C:\Users\stefa\Documents\A A C_Compiler_CSharp_8\Calculator_CS_8\obj\Debug\Calculator_CS_8.csproj.CoreCompileInputs.cache
+C:\Users\stefa\Documents\A A C_Compiler_CSharp_8\Calculator_CS_8\bin\Debug\Calculator_CS_8.exe.config
+C:\Users\stefa\Documents\A A C_Compiler_CSharp_8\Calculator_CS_8\bin\Debug\Calculator_CS_8.exe
+C:\Users\stefa\Documents\A A C_Compiler_CSharp_8\Calculator_CS_8\bin\Debug\Calculator_CS_8.pdb
+C:\Users\stefa\Documents\A A C_Compiler_CSharp_8\Calculator_CS_8\bin\Debug\QUT.ShiftReduceParser.dll
+C:\Users\stefa\Documents\A A C_Compiler_CSharp_8\Calculator_CS_8\obj\Debug\Calculator_CS_8.csproj.CopyComplete
+C:\Users\stefa\Documents\A A C_Compiler_CSharp_8\Calculator_CS_8\obj\Debug\Calculator_CS_8.exe
+C:\Users\stefa\Documents\A A C_Compiler_CSharp_8\Calculator_CS_8\obj\Debug\Calculator_CS_8.pdb

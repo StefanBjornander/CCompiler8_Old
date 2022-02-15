@@ -1,0 +1,304 @@
+%namespace CCompiler_Main
+
+%using CCompiler;
+%using System.Numerics;
+
+%{
+  public static FileInfo Path = null;
+  public static int Line = 1000;
+
+%}
+
+DECIMAL_VALUE [\+\-]?[1-9][0-9]*
+OCTAL_VALUE [\+\-]?0[0-7]*
+HEXADECIMAL_VALUE [\+\-]?0[xX][0-9a-fA-F]+
+POSTFIX ([uU]?[sSlL]?)|([sSlL]?[uU]?)
+INTEGRAL_VALUE ({DECIMAL_VALUE}|{OCTAL_VALUE}|{HEXADECIMAL_VALUE}){POSTFIX}
+
+DECIMAL_WITHOUT_EXPONENT (([0-9]+\.[0-9]*)|([0-9]*\.[0-9]+))
+DECIMAL_WITH_EXPONENT    [0-9]+|(([0-9]+\.[0-9]*)|([0-9]*\.[0-9]+))
+EXPONENT                 [eE][\+\-]?[0-9]+
+FLOATING_VALUE           [\+\-]?({DECIMAL_WITHOUT_EXPONENT}|({DECIMAL_WITH_EXPONENT}{EXPONENT}))[flFL]?
+
+/*DECIMAL_PART [\+\-]?([0-9]+|[0-9]+\.[0-9]*|\.[0-9]+)
+EXPONENT_PART (([eE][\+\-]?[0-9]+)?|[0-9]+[eE][\+\-]?[0-9]+)([fF]|[lL])?
+FLOATING_VALUE {DECIMAL_PART}{EXPONENT_PART}*/
+
+CHAR_VALUE \'(\\\'|[^'])*\'
+STRING_VALUE \"(\\\"|[^"])*\"
+
+REGISTER_NAME "register_"[a-z]+
+NAME [a-zA-Z_$][a-zA-Z0-9_]*
+
+PATH_LINE \$.*\$
+WHITE_SPACE [ \t\r\n\f]
+
+%%
+"auto"          { return ((int) Tokens.AUTO);            }
+"break"         { return ((int) Tokens.BREAK);           }
+"case"          { return ((int) Tokens.CASE);            }
+"carry_flag"    { return ((int) Tokens.CARRY_FLAG);      }
+"char"          { return ((int) Tokens.CHAR);            }
+"const"         { return ((int) Tokens.CONSTANT);        }
+"continue"      { return ((int) Tokens.CONTINUE);        }
+"default"       { return ((int) Tokens.DEFAULT);         }
+"do"            { return ((int) Tokens.DO);              }
+"double"        { return ((int) Tokens.DOUBLE);          }
+"else"          { return ((int) Tokens.ELSE);            }
+"enum"          { return ((int) Tokens.ENUM);            }
+"extern"        { return ((int) Tokens.EXTERN);          }
+"float"         { return ((int) Tokens.FLOAT);           }
+"for"           { return ((int) Tokens.FOR);             }
+"goto"          { return ((int) Tokens.GOTO);            }
+"int"           { return ((int) Tokens.INT);             }
+"interrupt"     { return ((int) Tokens.INTERRUPT);       }
+"if"            { return ((int) Tokens.IF);              }
+"jump_register" { return ((int) Tokens.JUMP_REGISTER);   }
+"long"          { return ((int) Tokens.LONG);            }
+"register"      { return ((int) Tokens.REGISTER);        }
+"return"        { return ((int) Tokens.RETURN);          }
+"short"         { return ((int) Tokens.SHORT);           }
+"signed"        { return ((int) Tokens.SIGNED);          }
+"sizeof"        { return ((int) Tokens.SIZEOF);          }
+"stack_top"     { return ((int) Tokens.STACK_TOP);       }
+"static"        { return ((int) Tokens.STATIC);          }
+"struct"        { return ((int) Tokens.STRUCT);          }
+"switch"        { return ((int) Tokens.SWITCH);          }
+"syscall"       { return ((int) Tokens.SYSCALL);         }
+"typedef"       { return ((int) Tokens.TYPEDEF);         }
+"union"         { return ((int) Tokens.UNION);           }
+"unsigned"      { return ((int) Tokens.UNSIGNED);        }
+"while"         { return ((int) Tokens.WHILE);           }
+"void"          { return ((int) Tokens.VOID);            }
+"volatile"      { return ((int) Tokens.VOLATILE);        }
+
+";" { return ((int) Tokens.SEMICOLON); }
+":" { return ((int) Tokens.COLON); }
+"," { return ((int) Tokens.COMMA); }
+
+"." { return ((int) Tokens.DOT); }
+"->" { return ((int) Tokens.ARROW); }
+"..." { return ((int) Tokens.ELLIPSE); }
+
+"(" { return ((int) Tokens.LEFT_PARENTHESIS); }
+")" { return ((int) Tokens.RIGHT_PARENTHESIS); }
+"{" { return ((int) Tokens.LEFT_BLOCK); }
+"}" { return ((int) Tokens.RIGHT_BLOCK); }
+"[" { return ((int) Tokens.LEFT_SQUARE); }
+"]" { return ((int) Tokens.RIGHT_SQUARE); }
+
+"*" { return ((int) Tokens.ASTERRISK); }
+"?" { return ((int) Tokens.QUESTION_MARK); }
+
+"||" { return ((int) Tokens.LOGICAL_OR); }
+"&&" { return ((int) Tokens.LOGICAL_AND); }
+"!" { return ((int) Tokens.LOGICAL_NOT); }
+"&" { return ((int) Tokens.AMPERSAND); }
+"^" { return ((int) Tokens.BITWISE_XOR); }
+"|" { return ((int) Tokens.BITWISE_OR); }
+"~" { return ((int) Tokens.BITWISE_NOT); }
+
+"==" { return ((int) Tokens.EQUAL); }
+"!=" { return ((int) Tokens.NOT_EQUAL); }
+
+"<"  { return ((int) Tokens.LESS_THAN); }
+"<=" { return ((int) Tokens.LESS_THAN_EQUAL); }
+">"  { return ((int) Tokens.GREATER_THAN); }
+">=" { return ((int) Tokens.GREATER_THAN_EQUAL); }
+
+"<<" { return ((int) Tokens.LEFT_SHIFT); }
+">>" { return ((int) Tokens.RIGHT_SHIFT); }
+
+"+" { return ((int) Tokens.PLUS); }
+"-" { return ((int) Tokens.MINUS); }
+
+"/" { return ((int) Tokens.DIVIDE); }
+"%" { return ((int) Tokens.MODULO); }
+
+"++" { return ((int) Tokens.INCREMENT); }
+"--" { return ((int) Tokens.DECREMENT); }
+
+"="  { return ((int) Tokens.ASSIGN); }
+"+="  { return ((int) Tokens.ADD_ASSIGN); }
+"-="  { return ((int) Tokens.SUBTRACT_ASSIGN); }
+"*="  { return ((int) Tokens.MULTIPLY_ASSIGN); }
+"/="  { return ((int) Tokens.DIVIDE_ASSIGN); }
+"%="  { return ((int) Tokens.MODULO_ASSIGN); }
+"<<=" { return ((int) Tokens.LEFT_SHIFT_ASSIGN); }
+">>=" { return ((int) Tokens.RIGHT_SHIFT_ASSIGN); }
+"&="  { return ((int) Tokens.AND_ASSIGN); }
+"^="  { return ((int) Tokens.XOR_ASSIGN); }
+"|="  { return ((int) Tokens.OR_ASSIGN); }
+
+{REGISTER_NAME} {
+  { Register register;
+    string text = yytext.Substring(9);
+
+    if (Enum.TryParse<Register>(text, out register)) {
+      yylval.register = register;
+      return ((int) Tokens.REGISTER_NAME);
+    }
+    
+    Error.Report(text, Message.Unknown_register);
+  }
+}
+
+{NAME} {
+  { string name = yytext;
+
+    if (Start.Linux && (name.Equals("abs") ||
+        name.Equals("_start") || name.Equals("section") ||
+        name.Equals("extern") || name.Equals("global"))) {
+      name = Symbol.FileMarker + name;
+    }
+
+    Symbol symbol = SymbolTable.CurrentTable.LookupSymbol(name);
+
+    if ((symbol != null) && symbol.IsTypedef()) {
+      yylval.type = symbol.Type;
+      return ((int) Tokens.TYPEDEF_NAME);
+    }
+    else {
+      yylval.name = name;
+      return ((int) Tokens.NAME);
+    }
+  }
+}
+
+{INTEGRAL_VALUE} {
+  { string text = yytext.Trim().ToLower();
+
+    bool minus = false;
+    if (text.StartsWith("+")) {
+      text = text.Substring(1);
+    }
+    else if (text.StartsWith("-")) {
+      minus = true;
+      text = text.Substring(1);
+    }
+    
+    int fromBase;
+    if (text.StartsWith("0x")) {
+      fromBase = 16;
+      text = text.Substring(2);
+    }
+    else if (text.StartsWith("0")) {
+      fromBase = 8;
+    }
+    else {
+      fromBase = 10;
+    }
+
+    CCompiler.Type type;
+    if (text.EndsWith("us") || text.EndsWith("su")) {
+      type = CCompiler.Type.UnsignedShortIntegerType;
+      text = text.Substring(0, text.Length - 2);
+    }
+    else if (text.EndsWith("ul") || text.EndsWith("lu")) {
+      type = CCompiler.Type.UnsignedLongIntegerType;
+      text = text.Substring(0, text.Length - 2);
+    }
+    else if (text.EndsWith("u")) {
+      type = CCompiler.Type.UnsignedIntegerType;
+      text = text.Substring(0, text.Length - 1);
+    }
+    else if (text.EndsWith("s")) {
+      type = CCompiler.Type.SignedShortIntegerType;
+      text = text.Substring(0, text.Length - 1);
+    }
+    else if (text.EndsWith("l")) {
+      type = CCompiler.Type.SignedLongIntegerType;
+      text = text.Substring(0, text.Length - 1);
+    }
+    else {
+      type = CCompiler.Type.SignedIntegerType;
+    }
+    
+    //text = text.Replace("x", "").Replace("s", "").Replace("l", "").Replace("u", "");
+  
+    try {
+      ulong unsignedValue = Convert.ToUInt64(text, fromBase);
+      BigInteger bigValue = new BigInteger(unsignedValue);
+
+      if (minus) {
+        bigValue = -bigValue;
+      }
+
+      yylval.symbol = new Symbol(type, bigValue);
+      /*yylval.symbol.StaticSymbol =
+        ConstantExpression.Value(yylval.symbol.UniqueName, type, bigValue);
+      SymbolTable.StaticSet.Add(yylval.symbol.StaticSymbol);*/
+    }
+    catch (OverflowException) {
+      Error.Report(type + ": " + text, Message.Value_overflow);
+    }
+
+    return ((int) Tokens.VALUE);
+  }
+}
+
+{FLOATING_VALUE} {
+  { string text = yytext.ToLower();
+    CCompiler.Type type;
+
+    if (text.EndsWith("f")) {
+      type = CCompiler.Type.FloatType;
+      text = text.Substring(0, text.Length - 1);
+    }
+    else if (text.EndsWith("l")) {
+      type = CCompiler.Type.LongDoubleType;
+      text = text.Substring(0, text.Length - 1);
+    }
+    else {
+      type = CCompiler.Type.DoubleType;
+    }
+
+    try {
+      decimal value = decimal.Parse(text, NumberStyles.Float);
+      yylval.symbol = new Symbol(type, value);
+      /*yylval.symbol.StaticSymbol =
+        ConstantExpression.Value(yylval.symbol.UniqueName, type, value);
+      SymbolTable.StaticSet.Add(yylval.symbol.StaticSymbol);*/
+    }
+    catch (OverflowException) {
+      Error.Report(type + ": " + text, Message.Value_overflow);
+    }
+
+    return ((int) Tokens.VALUE);
+  }
+}
+
+{CHAR_VALUE} {
+  { CCompiler.Type type = new CCompiler.Type(Sort.SignedChar);
+    string text = Slash.SlashToChar(yytext);
+    Error.Check(text.Length == 3, yytext, Message.Invalid_char_sequence);
+    yylval.symbol = new Symbol(type, (BigInteger) ((int) text[1]));
+    return ((int) Tokens.VALUE);
+  }
+}
+
+{STRING_VALUE} {
+  { CCompiler.Type type = new CCompiler.Type(Sort.String);
+    string text = Slash.SlashToChar(yytext);
+    object value = text.Substring(1, text.Length - 2);
+    yylval.symbol = new Symbol(type, value);
+    SymbolTable.StaticSet.Add(ConstantExpression.Value(yylval.symbol));
+    return ((int) Tokens.VALUE);
+  }
+}
+
+{PATH_LINE} {
+  { string text = yytext.Substring(1, yyleng - 2);
+    int index = text.IndexOf(',');
+    Path = new FileInfo(text.Substring(0, index).Replace("+", " "));
+    Line = int.Parse(text.Substring(index + 1));
+  }
+}
+
+{WHITE_SPACE} {
+  if (yytext.Equals("\n")) {
+    ++Line;
+  }
+}
+
+. { Error.Report(yytext, Message.Unknown_character); }

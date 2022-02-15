@@ -1,0 +1,89 @@
+%namespace CCompiler_Exp
+
+%using CCompiler;
+
+%{
+  // Empty.
+%}
+
+OCTAL_VALUE (\+|\-)?[0][0-7]*([uU]|[sSlL]|[uU][sSlL]|[sSlL][uU])?
+DECIMAL_VALUE (\+|\-)?[1-9][0-9]*([uU]|[sSlL]|[uU][sSlL]|[sSlL][uU])?
+HEXADECIMAL_VALUE (\+|\-)?[0][xX][0-9a-fA-F]+([uU]|[sSlL]|[uU][sSlL]|[sSlL][uU])?
+
+NAME [a-zA-Z_][a-zA-Z0-9_]*
+WHITE_SPACE [ \t\r\n\f]
+
+%%
+"defined" { return ((int) Tokens.DEFINED); }
+
+"?" { return ((int) Tokens.QUESTION_MARK); }
+":" { return ((int) Tokens.COLON); }
+
+"||" { return ((int) Tokens.LOGICAL_OR); }
+"&&" { return ((int) Tokens.LOGICAL_AND); }
+"!" { return ((int) Tokens.LOGICAL_NOT); }
+
+"&" { return ((int) Tokens.BITWISE_AND); }
+"^" { return ((int) Tokens.BITWISE_XOR); }
+"|" { return ((int) Tokens.BITWISE_OR); }
+"~" { return ((int) Tokens.BITWISE_NOT); }
+
+"==" { return ((int) Tokens.EQUAL); }
+"!=" { return ((int) Tokens.NOT_EQUAL); }
+
+"<"  { return ((int) Tokens.LESS_THAN); }
+"<=" { return ((int) Tokens.LESS_THAN_EQUAL); }
+">"  { return ((int) Tokens.GREATER_THAN); }
+">=" { return ((int) Tokens.GREATER_THAN_EQUAL); }
+
+"<<" { return ((int) Tokens.LEFT_SHIFT); }
+">>" { return ((int) Tokens.RIGHT_SHIFT); }
+
+"+" { return ((int) Tokens.ADD); }
+"-" { return ((int) Tokens.SUBTRACT); }
+
+"*" { return ((int) Tokens.MULTIPLY); }
+"/" { return ((int) Tokens.DIVIDE); }
+"%" { return ((int) Tokens.MODULO); }
+
+"(" { return ((int) Tokens.LEFT_PARENTHESIS); }
+")" { return ((int) Tokens.RIGHT_PARENTHESIS); }
+
+"\0" { return ((int) Tokens.EOL); }
+
+{NAME} {
+  yylval.name = yytext;
+  return ((int) Tokens.NAME);
+}
+
+{OCTAL_VALUE} {
+  { string text = yytext.ToLower().Replace("u", "").Replace("s", "")
+                                  .Replace("l", "");
+    yylval.integer_value = Convert.ToInt32(text, 8);
+    return ((int) Tokens.VALUE);
+  }
+}
+
+{DECIMAL_VALUE} {
+  { string text = yytext.ToLower().Replace("u", "").Replace("s", "")
+                                  .Replace("l", "");
+    yylval.integer_value = Convert.ToInt32(text, 10);
+    return ((int) Tokens.VALUE);
+  }
+}
+
+{HEXADECIMAL_VALUE} {
+  { string text = yytext.ToLower().Replace("x", "").Replace("u", "").
+                                   Replace("s", "").Replace("l", "");
+    yylval.integer_value = Convert.ToInt32(text, 16);
+    return ((int) Tokens.VALUE);
+  }
+}
+
+{WHITE_SPACE} {
+  if (yytext.Equals("\n")) {
+    ++CCompiler_Main.Scanner.Line;
+  }
+}
+
+. { Error.Report(yytext, Message.Unknown_character); }

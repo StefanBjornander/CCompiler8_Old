@@ -1,0 +1,22 @@
+%namespace CCompiler_Pre
+%partial
+
+%{
+  // Empty.
+%}
+
+%union {
+  public string name;
+}
+
+%token <name> NAME NAME_WITH_PARENTHESES STRING LEFT_PARENTHESIS
+              RIGHT_PARENTHESIS COMMA SHARP DOUBLE_SHARP TOKEN END_OF_LINE
+
+%start translation_unit
+
+%%
+
+translation_unit:
+  /* Empty. */;
+
+%%

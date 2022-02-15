@@ -1,0 +1,17 @@
+/* The area and circumference of a circle */
+read "Input the radius of a circle: ", radius;
+assign area = pi * radius * radius;
+assign circumference = 2 * pi * radius;
+write "The area and circumference are: ", area, circumference;
+newline;
+
+/* Fahrenheit to Celsius */
+read "Input a temperature in degrees Fahrenheit: ", fahrenheit;
+assign celsius = (fahrenheit - 32) / 1.8;
+write "In Celsius degrees: ", celsius;
+newline;
+
+/* Pythagorean Theorem */
+read "Input the two cathetuses of a right-angled triangle: ", a, b;
+assign c = sqrt(a * a + b * b);
+write "The hypothenuse is: ", c;
